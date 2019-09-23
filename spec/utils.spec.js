@@ -76,7 +76,7 @@ describe('makeRefObj', () => {
   });
   it('does NOT mutate objects within input array', () => {
     const original = [{ a: 1 }, { b: 2 }, { c: 3 }];
-    formatDates(original);
+    makeRefObj(original);
     expect(original).to.eql([{ a: 1 }, { b: 2 }, { c: 3 }]);
   });
   it('returns an object with the correct key-value pair when passed an array of one object', () => {
@@ -106,4 +106,50 @@ describe('makeRefObj', () => {
   });
 });
 
-describe('formatComments', () => {});
+describe('formatComments', () => {
+  const input = [
+    {
+      body:
+        "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+      belongs_to: "They're not exactly dogs, are they?",
+      created_by: 'butter_bridge',
+      votes: 16,
+      created_at: 1511354163389
+    }
+  ];
+  const refObj = { "They're not exactly dogs, are they?": 5 };
+  it('returns an empty array when passed an empty array', () => {
+    expect(formatComments([], refObj)).to.eql([]);
+  });
+  it('does NOT mutate input array', () => {
+    const original = [1, 2, 3, 4, 5];
+    formatComments(original, refObj);
+    expect(original).to.eql([1, 2, 3, 4, 5]);
+  });
+  it('does NOT mutate objects within input array', () => {
+    const original = [{ a: 1 }, { b: 2 }, { c: 3 }];
+    formatComments(original, refObj);
+    expect(original).to.eql([{ a: 1 }, { b: 2 }, { c: 3 }]);
+  });
+  describe('Objects within returned array', () => {
+    it('`created_by` renamed to `author`', () => {
+      expect(formatComments(input, refObj)[0].author).to.equal('butter_bridge');
+      expect(formatComments(input, refObj)[0].created_by).to.equal(undefined);
+    });
+    it('`belongs_to` renamed to `article_id` and value is replaced', () => {
+      expect(formatComments(input, refObj)[0].article_id).to.equal(5);
+      expect(formatComments(input, refObj)[0].belongs_to).to.equal(undefined);
+    });
+    it('`created_at` converted to date object', () => {
+      expect(formatComments(input, refObj)[0].created_at).to.be.instanceOf(
+        Date
+      );
+    });
+    it('retains all other information', () => {
+      expect(formatComments(input, refObj)[0].body).to.equal(
+        "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+      );
+      expect(formatComments(input, refObj)[0].votes).to.equal(16);
+    });
+  });
+});
