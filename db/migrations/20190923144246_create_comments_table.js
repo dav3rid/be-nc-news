@@ -11,7 +11,8 @@ exports.up = connection => {
       .references('articles.article_id')
       .notNullable();
     commentsTable.integer('votes').defaultsTo(0);
-    commentsTable.timestamp('created_at');
+    commentsTable.timestamp('created_at').defaultsTo(connection.fn.now());
+    commentsTable.text('body').notNullable();
   });
 };
 
