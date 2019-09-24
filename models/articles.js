@@ -18,3 +18,18 @@ exports.fetchArticleById = article_id => {
       }
     });
 };
+
+exports.updateArticleById = (article_id, inc_votes) => {
+  return connection('articles')
+    .select('votes')
+    .where({ article_id })
+    .then(([{ votes }]) => {
+      const updatedVotes = (votes += inc_votes);
+      return connection('articles')
+        .update({ votes: updatedVotes }, '*')
+        .where({ article_id });
+    })
+    .then(([updatedArticle]) => {
+      return updatedArticle;
+    });
+};
