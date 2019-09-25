@@ -593,7 +593,29 @@ describe('/api', () => {
             });
         });
       });
-      describe('DELETE', () => {});
+      describe('DELETE', () => {
+        it('status: 204, no content to respond with', () => {
+          return request(app)
+            .delete('/api/comments/1')
+            .expect(204);
+        });
+        it('status: 400, where given `comment_id` is invalid', () => {
+          return request(app)
+            .delete('/api/comments/DELETE_COMMENT')
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal('Bad request.');
+            });
+        });
+        it('status: 404, where comment does not exist', () => {
+          return request(app)
+            .delete('/api/comments/9999')
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal('Comment not found.');
+            });
+        });
+      });
       describe('INVALID METHODS', () => {
         it('status: 405, for methods GET, POST, PUT', () => {
           const invalidMethods = ['get', 'post', 'put'];
