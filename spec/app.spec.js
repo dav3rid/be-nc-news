@@ -123,6 +123,7 @@ describe('/api', () => {
             .then(({ body: { updatedArticle } }) => {
               expect(updatedArticle.votes).to.equal(150);
               expect(updatedArticle.topic).to.equal('mitch');
+              expect(updatedArticle.comment_count).to.equal(13);
             });
         });
         it('status: 200, responds with the updated article (decrement votes)', () => {
@@ -134,8 +135,66 @@ describe('/api', () => {
             .then(({ body: { updatedArticle } }) => {
               expect(updatedArticle.votes).to.equal(95);
               expect(updatedArticle.topic).to.equal('mitch');
+              expect(updatedArticle.comment_count).to.equal(13);
             });
         });
+        it('status: 400, where given article_id is invalid', () => {
+          return request(app)
+            .patch('/api/articles/notValid')
+            .send({ inc_votes: 10 })
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal('Bad request.');
+            });
+        });
+        it('status: 400, where request body object has no `inc_votes` key', () => {
+          return request(app)
+            .patch('/api/articles/1')
+            .send({ testKey: 10 })
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal(
+                'Bad request - `inc_votes` must be a number.'
+              );
+            });
+        });
+        it('status: 400, where request body object has invalid value for `inc_votes`', () => {
+          return request(app)
+            .patch('/api/articles/1')
+            .send({ inc_votes: 'hello' })
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal(
+                'Bad request - `inc_votes` must be a number.'
+              );
+            });
+        });
+        it('status: 404, where article does not exist', () => {
+          return request(app)
+            .patch('/api/articles/9999')
+            .send({ inc_votes: 10 })
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal('Article not found.');
+            });
+        });
+      });
+      describe('INVALID METHODS', () => {
+        it('status: 405, for methods DELETE, POST, PUT', () => {
+          const invalidMethods = ['delete', 'post', 'put'];
+          const promises = invalidMethods.map(method => {
+            return request(app)
+              [method]('/api/articles/1')
+              .expect(405)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal('Method not allowed.');
+              });
+          });
+          return Promise.all(promises);
+        });
+      });
+      describe('/comments', () => {
+        describe('POST', () => {});
       });
     });
   });
