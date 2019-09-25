@@ -113,7 +113,7 @@ describe('/api', () => {
             });
         });
       });
-      describe.only('PATCH', () => {
+      describe('PATCH', () => {
         it('status: 200, responds with the updated article (increment votes)', () => {
           const input = { inc_votes: 50 };
           return request(app)

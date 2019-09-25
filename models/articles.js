@@ -1,20 +1,37 @@
 const connection = require('../db/connection');
 
+// exports.fetchArticleById = article_id => {
+//   return connection('articles')
+//     .select('*')
+//     .where({ article_id })
+//     .then(([article]) => {
+//       if (article === undefined) {
+//         return Promise.reject({ status: 404, msg: 'Article not found.' });
+//       } else {
+//         return connection('comments')
+//           .select('*')
+//           .where({ article_id })
+//           .then(comments => {
+//             article.comment_count = comments.length;
+//             return article;
+//           });
+//       }
+//     });
+// };
+
 exports.fetchArticleById = article_id => {
   return connection('articles')
-    .select('*')
-    .where({ article_id })
+    .select('articles.*')
+    .count({ comment_count: 'comment_id' })
+    .leftJoin('comments', 'articles.article_id', 'comments.article_id')
+    .groupBy('articles.article_id')
+    .where('articles.article_id', article_id)
     .then(([article]) => {
-      if (article === undefined) {
+      if (!article) {
         return Promise.reject({ status: 404, msg: 'Article not found.' });
       } else {
-        return connection('comments')
-          .select('*')
-          .where({ article_id })
-          .then(comments => {
-            article.comment_count = comments.length;
-            return article;
-          });
+        article.comment_count = +article.comment_count;
+        return article;
       }
     });
 };
