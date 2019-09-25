@@ -77,6 +77,167 @@ describe('/api', () => {
     });
   });
   describe('/articles', () => {
+    describe('GET', () => {
+      it('status: 200, responds with an array of all article objects (no query)', () => {
+        return request(app)
+          .get('/api/articles')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.be.an('array');
+            expect(articles.length).to.equal(12);
+            expect(articles[0]).to.contain.keys('comment_count');
+          });
+      });
+      describe('QUERIES', () => {
+        describe('status: 200', () => {
+          it('defaults to `sort_by=created_at&order=desc', () => {
+            return request(app)
+              .get('/api/articles')
+              .expect(200)
+              .then(({ body: { articles } }) => {
+                expect(articles).to.be.descendingBy('created_at');
+              });
+          });
+          it('accepts `sort_by=author`', () => {
+            return request(app)
+              .get('/api/articles?sort_by=author')
+              .expect(200)
+              .then(({ body: { articles } }) => {
+                expect(articles).to.be.descendingBy('author');
+              });
+          });
+          it('accepts `sort_by=title`', () => {
+            return request(app)
+              .get('/api/articles?sort_by=title')
+              .expect(200)
+              .then(({ body: { articles } }) => {
+                expect(articles).to.be.descendingBy('title');
+              });
+          });
+          it('accepts `sort_by=article_id&order=asc`', () => {
+            return request(app)
+              .get('/api/articles?sort_by=article_id&order=asc')
+              .expect(200)
+              .then(({ body: { articles } }) => {
+                expect(articles).to.be.ascendingBy('article_id');
+              });
+          });
+          it('accepts `sort_by=topic`', () => {
+            return request(app)
+              .get('/api/articles?sort_by=topic')
+              .expect(200)
+              .then(({ body: { articles } }) => {
+                expect(articles).to.be.descendingBy('topic');
+              });
+          });
+          it('accepts `sort_by=created_at`', () => {
+            return request(app)
+              .get('/api/articles?sort_by=created_at')
+              .expect(200)
+              .then(({ body: { articles } }) => {
+                expect(articles).to.be.descendingBy('created_at');
+              });
+          });
+          it('accepts `sort_by=votes`', () => {
+            return request(app)
+              .get('/api/articles?sort_by=votes')
+              .expect(200)
+              .then(({ body: { articles } }) => {
+                expect(articles).to.be.descendingBy('votes');
+              });
+          });
+          it('accepts `sort_by=comment_count`', () => {
+            return request(app)
+              .get('/api/articles?sort_by=comment_count')
+              .expect(200)
+              .then(({ body: { articles } }) => {
+                expect(articles).to.be.descendingBy('comment_count');
+              });
+          });
+          it('accepts `author=*******`', () => {
+            return request(app)
+              .get('/api/articles?author=butter_bridge')
+              .expect(200)
+              .then(({ body: { articles } }) => {
+                const promises = articles.map(article => {
+                  expect(article.author).to.equal('butter_bridge');
+                });
+                return Promise.all(promises);
+              });
+          });
+          it('accepts `topic=*******`', () => {
+            return request(app)
+              .get('/api/articles?topic=cats')
+              .expect(200)
+              .then(({ body: { articles } }) => {
+                const promises = articles.map(article => {
+                  expect(article.topic).to.equal('cats');
+                });
+                return Promise.all(promises);
+              });
+          });
+          it('accepts `author=******* AND topic=*******`', () => {
+            return request(app)
+              .get('/api/articles?topic=mitch&author=icellusedkars')
+              .expect(200)
+              .then(({ body: { articles } }) => {
+                const promises = articles.map(article => {
+                  expect(article.topic).to.equal('mitch');
+                  expect(article.author).to.equal('icellusedkars');
+                });
+                return Promise.all(promises);
+              });
+          });
+          it('accepts multiple queries', () => {
+            return request(app)
+              .get(
+                '/api/articles?topic=mitch&author=icellusedkars&sort_by=votes&order=asc'
+              )
+              .expect(200)
+              .then(({ body: { articles } }) => {
+                const promises = articles.map(article => {
+                  expect(article.topic).to.equal('mitch');
+                  expect(article.author).to.equal('icellusedkars');
+                });
+                expect(articles).to.be.ascendingBy('votes');
+                return Promise.all(promises);
+              });
+          });
+        });
+        describe('errors', () => {
+          it('status: 200, ignores invalid query and defaults', () => {
+            return request(app)
+              .get('/api/articles?sortEverything=author')
+              .expect(200)
+              .then(({ body: { articles } }) => {
+                expect(articles).to.be.descendingBy('created_at');
+              });
+          });
+          it('status: 400, where query value is invalid column name', () => {
+            return request(app)
+              .get('/api/articles?sort_by=tallest_author')
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal('Bad request - invalid query.');
+              });
+          });
+        });
+      });
+    });
+    describe('INVALID METHODS', () => {
+      it('status: 405, for methods DELETE, PATCH, PUT, POST', () => {
+        const invalidMethods = ['delete', 'patch', 'put', 'post'];
+        const promises = invalidMethods.map(method => {
+          return request(app)
+            [method]('/api/articles')
+            .expect(405)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal('Method not allowed.');
+            });
+        });
+        return Promise.all(promises);
+      });
+    });
     describe('/:article_id', () => {
       describe('GET', () => {
         it('status: 200, responds with object of requested article', () => {
@@ -333,20 +494,20 @@ describe('/api', () => {
                   expect(comments).to.be.descendingBy('author');
                 });
             });
+            it('status: 200, ignores invalid query and defaults', () => {
+              return request(app)
+                .get('/api/articles/1/comments?filter_by=author')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                  expect(comments).to.be.descendingBy('created_at');
+                });
+            });
             it('status: 400, where query value is invalid column name', () => {
               return request(app)
                 .get('/api/articles/1/comments?sort_by=tallest_author')
                 .expect(400)
                 .then(({ body: { msg } }) => {
                   expect(msg).to.equal('Bad request - invalid query.');
-                });
-            });
-            it('status: 200, ignores invalid query', () => {
-              return request(app)
-                .get('/api/articles/1/comments?filter_by=author')
-                .expect(200)
-                .then(({ body: { comments } }) => {
-                  expect(comments).to.be.descendingBy('created_at');
                 });
             });
           });
