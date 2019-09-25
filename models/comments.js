@@ -24,7 +24,11 @@ exports.addComment = commentObj => {
   }
 };
 
-exports.fetchCommentsByArticleId = article_id => {
+exports.fetchCommentsByArticleId = (
+  article_id,
+  sort_by = 'created_at',
+  order = 'desc'
+) => {
   if (isNaN(+article_id)) {
     return Promise.reject({
       status: 400,
@@ -34,6 +38,7 @@ exports.fetchCommentsByArticleId = article_id => {
     return connection('comments')
       .select('*')
       .where({ article_id })
+      .orderBy(sort_by, order)
       .then(comments => {
         if (comments.length < 1) {
           return Promise.reject({ status: 404, msg: 'Article not found.' });

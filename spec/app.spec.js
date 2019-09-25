@@ -1,5 +1,7 @@
 process.env.NODE_ENV = 'test';
-const { expect } = require('chai');
+const chai = require('chai');
+const { expect } = chai;
+chai.use(require('chai-sorted'));
 const app = require('../app');
 const request = require('supertest');
 const connection = require('../db/connection');
@@ -297,6 +299,56 @@ describe('/api', () => {
               .then(({ body: { msg } }) => {
                 expect(msg).to.equal('Article not found.');
               });
+          });
+          describe('QUERIES', () => {
+            it('defaults to `sort_by=created_at&order=desc', () => {
+              return request(app)
+                .get('/api/articles/1/comments')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                  expect(comments).to.be.descendingBy('created_at');
+                });
+            });
+            it('accepts `sort_by=comment_id`', () => {
+              return request(app)
+                .get('/api/articles/1/comments?sort_by=comment_id')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                  expect(comments).to.be.descendingBy('comment_id');
+                });
+            });
+            it('accepts `sort_by=votes&order=asc`', () => {
+              return request(app)
+                .get('/api/articles/1/comments?sort_by=votes&order=asc')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                  expect(comments).to.be.ascendingBy('votes');
+                });
+            });
+            it('accepts `sort_by=author`', () => {
+              return request(app)
+                .get('/api/articles/1/comments?sort_by=author')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                  expect(comments).to.be.descendingBy('author');
+                });
+            });
+            it('status: 400, where query value is invalid column name', () => {
+              return request(app)
+                .get('/api/articles/1/comments?sort_by=tallest_author')
+                .expect(400)
+                .then(({ body: { msg } }) => {
+                  expect(msg).to.equal('Bad request - invalid query.');
+                });
+            });
+            it('status: 200, ignores invalid query', () => {
+              return request(app)
+                .get('/api/articles/1/comments?filter_by=author')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                  expect(comments).to.be.descendingBy('created_at');
+                });
+            });
           });
         });
         describe('INVALID METHODS', () => {

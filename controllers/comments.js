@@ -19,9 +19,16 @@ exports.postComment = (req, res, next) => {
 
 exports.getCommentsByArticleId = (req, res, next) => {
   const { article_id } = req.params;
-  fetchCommentsByArticleId(article_id)
+  const { sort_by } = req.query;
+  const { order } = req.query;
+  fetchCommentsByArticleId(article_id, sort_by, order)
     .then(comments => {
       res.status(200).send({ comments });
     })
-    .catch(next);
+    .catch(err => {
+      if (!err.msg) {
+        err.msg = 'Bad request - invalid query.';
+      }
+      next(err);
+    });
 };
