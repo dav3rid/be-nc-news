@@ -529,6 +529,87 @@ describe('/api', () => {
       });
     });
   });
+  describe('/comments', () => {
+    describe('/:comment_id', () => {
+      describe('PATCH', () => {
+        it('status: 200, responds with the updated comment (increment votes)', () => {
+          const input = { inc_votes: 50 };
+          return request(app)
+            .patch('/api/comments/1')
+            .send(input)
+            .expect(200)
+            .then(({ body: { comment } }) => {
+              expect(comment.votes).to.equal(66);
+            });
+        });
+        it('status: 200, responds with the updated comment (decrement votes)', () => {
+          const input = { inc_votes: -100 };
+          return request(app)
+            .patch('/api/comments/1')
+            .send(input)
+            .expect(200)
+            .then(({ body: { comment } }) => {
+              expect(comment.votes).to.equal(-84);
+            });
+        });
+        it('status: 400, where given article_id is invalid', () => {
+          return request(app)
+            .patch('/api/comments/INVALID')
+            .send({ inc_votes: 10 })
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal('Bad request.');
+            });
+        });
+        it('status: 400, where request body object has no `inc_votes` key', () => {
+          return request(app)
+            .patch('/api/comments/1')
+            .send({ testKey: 10 })
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal(
+                'Bad request - `inc_votes` must be a number.'
+              );
+            });
+        });
+        it('status: 400, where request body object has invalid value for `inc_votes`', () => {
+          return request(app)
+            .patch('/api/comments/1')
+            .send({ inc_votes: 'hello' })
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal(
+                'Bad request - `inc_votes` must be a number.'
+              );
+            });
+        });
+        it('status: 404, where comment does not exist', () => {
+          return request(app)
+            .patch('/api/comments/9999')
+            .send({ inc_votes: 10 })
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal('Comment not found.');
+            });
+        });
+      });
+      describe('DELETE', () => {});
+      describe('INVALID METHODS', () => {
+        it('status: 405, for methods GET, POST, PUT', () => {
+          const invalidMethods = ['get', 'post', 'put'];
+          const promises = invalidMethods.map(method => {
+            return request(app)
+              [method]('/api/comments/1')
+              .expect(405)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal('Method not allowed.');
+              });
+          });
+          return Promise.all(promises);
+        });
+      });
+    });
+  });
   describe('General 404 errors', () => {
     it('status:404, (general) path not found', () => {
       return request(app)

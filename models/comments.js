@@ -48,3 +48,24 @@ exports.fetchCommentsByArticleId = (
       });
   }
 };
+
+exports.updateCommentById = (comment_id, inc_votes) => {
+  if (typeof inc_votes !== 'number') {
+    return Promise.reject({
+      status: 400,
+      msg: 'Bad request - `inc_votes` must be a number.'
+    });
+  } else {
+    return connection('comments')
+      .where({ comment_id })
+      .increment({ votes: inc_votes })
+      .returning('*')
+      .then(([comment]) => {
+        if (!comment) {
+          return Promise.reject({ status: 404, msg: 'Comment not found.' });
+        } else {
+          return comment;
+        }
+      });
+  }
+};
