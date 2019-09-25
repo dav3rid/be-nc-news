@@ -1,10 +1,19 @@
-exports.handlePsqlErrors = (err, req, res, next) => {
+exports.handleCustomErrors = (err, req, res, next) => {
   if (err.status) res.status(err.status).send({ msg: err.msg });
-  else if (err.code) {
-    const badRequestCodes = ['22P02'];
-    if (badRequestCodes.includes(err.code))
-      res.status(400).send({ msg: 'Bad request.' });
-  } else next(err);
+  else next(err);
+};
+
+exports.handlePsql400Errors = (err, req, res, next) => {
+  const codes = ['22P02'];
+  if (codes.includes(err.code))
+    res.status(400).send({ msg: err.msg || 'Bad request.' });
+  else next(err);
+};
+exports.handlePsql422Errors = (err, req, res, next) => {
+  const codes = ['23503'];
+  if (codes.includes(err.code))
+    res.status(422).send({ msg: err.msg || 'Unprocessable entity.' });
+  else next(err);
 };
 
 exports.handle500s = (err, req, res, next) => {

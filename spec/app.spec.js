@@ -194,7 +194,125 @@ describe('/api', () => {
         });
       });
       describe('/comments', () => {
-        describe('POST', () => {});
+        describe('POST', () => {
+          it('status: 201, returns the posted comment', () => {
+            return request(app)
+              .post('/api/articles/1/comments')
+              .send({
+                username: 'butter_bridge',
+                body: 'This is a test comment, a comment about testing'
+              })
+              .expect(201)
+              .then(({ body: { comment } }) => {
+                expect(comment.comment_id).to.equal(19);
+                expect(comment.author).to.equal('butter_bridge');
+                expect(comment.article_id).to.equal(1);
+                expect(comment.body).to.equal(
+                  'This is a test comment, a comment about testing'
+                );
+              });
+          });
+          it('status: 400, where given article_id is invalid', () => {
+            return request(app)
+              .post('/api/articles/INVALID/comments')
+              .send({
+                username: 'butter_bridge',
+                body: 'This is a test comment, a comment about testing'
+              })
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal(
+                  'Bad request - `article_id` must be a number.'
+                );
+              });
+          });
+          it('status: 400, where request body object contains invalid values', () => {
+            return request(app)
+              .post('/api/articles/1/comments')
+              .send({
+                username: 12,
+                body: 'This is a test comment, a comment about testing'
+              })
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal(
+                  'Bad request - input values must be strings.'
+                );
+              });
+          });
+          it('status: 400, where request body object is missing `username` or `body` keys', () => {
+            return request(app)
+              .post('/api/articles/1/comments')
+              .send({
+                invalidKey: 'butter_bridge',
+                body: 'This is a test comment, a comment about testing'
+              })
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal(
+                  'Bad request - input must have keys `username` and `body`.'
+                );
+              });
+          });
+          it('status: 422, where article referenced in another table does not exist', () => {
+            return request(app)
+              .post('/api/articles/9999/comments')
+              .send({
+                username: 'butter_bridge',
+                body: 'This is a test comment, a comment about testing'
+              })
+              .expect(422)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal(
+                  'Unprocessable entity - article does not exist.'
+                );
+              });
+          });
+        });
+        describe('GET', () => {
+          it('status: 200, returns the requested comments', () => {
+            return request(app)
+              .get('/api/articles/1/comments')
+              .expect(200)
+              .then(({ body: { comments } }) => {
+                expect(comments).to.be.an('array');
+                expect(comments.length).to.equal(13);
+                expect(comments[0].article_id).to.equal(1);
+              });
+          });
+          it('status: 400, where given article_id is invalid', () => {
+            return request(app)
+              .get('/api/articles/INVALID/comments')
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal(
+                  'Bad request - `article_id` must be a number.'
+                );
+              });
+          });
+          it('status: 404, where given article_id is valid but does not exist', () => {
+            return request(app)
+              .get('/api/articles/9999/comments')
+              .expect(404)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal('Article not found.');
+              });
+          });
+        });
+        describe('INVALID METHODS', () => {
+          it('status: 405, for methods DELETE, PATCH, PUT', () => {
+            const invalidMethods = ['delete', 'patch', 'put'];
+            const promises = invalidMethods.map(method => {
+              return request(app)
+                [method]('/api/articles/1/comments')
+                .expect(405)
+                .then(({ body: { msg } }) => {
+                  expect(msg).to.equal('Method not allowed.');
+                });
+            });
+            return Promise.all(promises);
+          });
+        });
       });
     });
   });
