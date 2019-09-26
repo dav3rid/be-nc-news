@@ -14,12 +14,7 @@ exports.postComment = (req, res, next) => {
     .then(([insertedComment]) => {
       res.status(201).send({ comment: insertedComment });
     })
-    .catch(err => {
-      if (!err.msg) {
-        err.msg = 'Unprocessable entity - article does not exist.';
-      }
-      next(err);
-    });
+    .catch(next);
 };
 
 exports.getCommentsByArticleId = (req, res, next) => {

@@ -1,27 +1,157 @@
 {
-  "GET /api": {
-    "description": "serves up a json representation of all the available endpoints of the api"
+  "/api": {
+    "GET": {
+      "description": "serves up a json representation of all the available endpoints of the api"
+    },
+    "INVALID METHODS": ["POST", "PUT", "PATCH", "DELETE"]
   },
-  "GET /api/topics": {
-    "description": "serves an array of all topics",
-    "queries": [],
-    "exampleResponse": {
-      "topics": [{ "slug": "football", "description": "Footie!" }]
-    }
+  "/api/topics": {
+    "GET": {
+      "description": "serves up an object containing an array of ALL topic objects",
+      "queries": [],
+      "exampleResponse": {
+        "topics": [
+          {
+            "slug": "cooking",
+            "description": "Hey good looking, what you got cooking?"
+          }
+        ]
+      }
+    },
+    "INVALID METHODS": ["POST", "PUT", "PATCH", "DELETE"]
   },
-  "GET /api/articles": {
-    "description": "serves an array of all topics",
-    "queries": ["author", "topic", "sort_by", "order"],
-    "exampleResponse": {
-      "articles": [
-        {
-          "title": "Seafood substitutions are increasing",
-          "topic": "cooking",
-          "author": "weegembump",
-          "body": "Text from the article..",
-          "created_at": 1527695953341
+  "/api/users/:username": {
+    "GET": {
+      "description": "serves up an object containing a single user object",
+      "queries": [],
+      "exampleResponse": {
+        "user": {
+          "username": "tickle122",
+          "avatar_url": "https://www.spiritsurfers.net/monastery/wp-content/uploads/_41500270_mrtickle.jpg",
+          "name": "Tom Tickle"
         }
-      ]
-    }
+      }
+    },
+    "INVALID METHODS": ["POST", "PUT", "PATCH", "DELETE"]
+  },
+  "/api/articles": {
+    "GET": {
+      "description": "serves up an object containing an array of article objects",
+      "queries": ["sort_by", "order", "author", "topic"],
+      "exampleResponse": {
+        "articles": [
+          {
+            "article_id": 33,
+            "title": "Seafood substitutions are increasing",
+            "body": "Some stuff",
+            "votes": 0,
+            "topic": "cooking",
+            "author": "weegembump",
+            "created_at": "2018-05-30T15:59:13.341Z",
+            "comment_count": 6
+          },
+          {
+            "article_id": 28,
+            "title": "High Altitude Cooking",
+            "body": "Gripping information",
+            "votes": 0,
+            "topic": "cooking",
+            "author": "happyamy2016",
+            "created_at": "2018-05-27T03:32:28.514Z",
+            "comment_count": 5
+          }
+        ]
+      }
+    },
+    "INVALID METHODS": ["POST", "PUT", "PATCH", "DELETE"]
+  },
+  "/api/articles/:article_id": {
+    "GET": {
+      "description": "serves up an object containing a single article object",
+      "queries": [],
+      "exampleResponse": {
+        "article": {
+          "article_id": 1,
+          "title": "Running a Node App",
+          "body": "This is part two of a series on how to get up and running with Systemd and Node.js.",
+          "votes": 0,
+          "topic": "coding",
+          "author": "jessjelly",
+          "created_at": "2016-08-18T12:07:52.389Z",
+          "comment_count": 8
+        }
+      }
+    },
+    "PATCH": {
+      "description": "updates votes on selected article - accepts a request body in the form `{ inc_votes: 10 }` and serves up an object containing the updated article object",
+      "queries": [],
+      "exampleResponse": {
+        "updatedArticle": {
+          "article_id": 1,
+          "title": "Running a Node App",
+          "body": "This is part two of a series on how to get up and running with Systemd and Node.js.",
+          "votes": 15,
+          "topic": "coding",
+          "author": "jessjelly",
+          "created_at": "2016-08-18T12:07:52.389Z",
+          "comment_count": 8
+        }
+      }
+    },
+    "INVALID METHODS": ["POST", "PUT", "DELETE"]
+  },
+  "/api/articles/:article_id/comments": {
+    "GET": {
+      "description": "serves up an object containing an array of ALL comments related to selected article",
+      "queries": ["sort_by", "order"],
+      "exampleResponse": {
+        "comments": [
+          {
+            "comment_id": 44,
+            "author": "grumpy19",
+            "article_id": 1,
+            "votes": 4,
+            "created_at": "2017-11-20T08:58:48.322Z",
+            "body": "Error est qui id corrupti et quod enim accusantium minus. Deleniti quae ea magni officiis et qui suscipit non."
+          }
+        ]
+      }
+    },
+    "POST": {
+      "description": "posts a comment and relates it to selected article - accepts a request body in the form `{ username: 'user123', body: 'My valuable opinion' }` and serves up an object containing the new comment object",
+      "queries": [],
+      "exampleResponse": {
+        "comment": {
+          "comment_id": 317,
+          "author": "tickle122",
+          "article_id": 1,
+          "votes": 0,
+          "created_at": "2019-09-26T14:23:36.509Z",
+          "body": "some stuff"
+        }
+      }
+    },
+    "INVALID METHODS": ["PUT", "PATCH", "DELETE"]
+  },
+  "/api/comments/:comment_id": {
+    "PATCH": {
+      "description": "updates votes on selected comment - accepts a request body in the form `{ inc_votes: 10 }` and serves up an object containing the updated comment object",
+      "queries": [],
+      "exampleResponse": {
+        "comment": {
+          "comment_id": 1,
+          "author": "tickle122",
+          "article_id": 18,
+          "votes": 2,
+          "created_at": "2016-07-09T18:07:18.932Z",
+          "body": "Itaque quisquam est similique et est perspiciatis reprehenderit voluptatem autem. Voluptatem accusantium eius error adipisci quibusdam doloribus."
+        }
+      }
+    },
+    "DELETE": {
+      "description": "deletes the selected comment and serves up no response",
+      "queries": []
+    },
+    "INVALID METHODS": ["GET", "PUT", "POST"]
   }
 }

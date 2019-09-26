@@ -10,6 +10,38 @@ after(() => connection.destroy());
 beforeEach(() => connection.seed.run());
 
 describe('/api', () => {
+  describe('GET', () => {
+    it('status: 200, responds with a JSON object describing all available endpoints', () => {
+      return request(app)
+        .get('/api')
+        .expect(200)
+        .then(({ body: { apiInfo } }) => {
+          expect(apiInfo).to.contain.keys(
+            '/api',
+            '/api/topics',
+            '/api/users/:username',
+            '/api/articles',
+            '/api/articles/:article_id',
+            '/api/articles/:article_id/comments',
+            '/api/comments/:comment_id'
+          );
+        });
+    });
+  });
+  describe('INVALID METHODS', () => {
+    it('status: 405, for methods DELETE, PATCH, POST, PUT', () => {
+      const invalidMethods = ['delete', 'patch', 'post', 'put'];
+      const promises = invalidMethods.map(method => {
+        return request(app)
+          [method]('/api')
+          .expect(405)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal('Method not allowed.');
+          });
+      });
+      return Promise.all(promises);
+    });
+  });
   describe('/topics', () => {
     describe('GET', () => {
       it('status: 200, responds with an array of all topics', () => {
@@ -442,9 +474,7 @@ describe('/api', () => {
               })
               .expect(422)
               .then(({ body: { msg } }) => {
-                expect(msg).to.equal(
-                  'Unprocessable entity - article does not exist.'
-                );
+                expect(msg).to.equal('Unprocessable entity.');
               });
           });
         });
