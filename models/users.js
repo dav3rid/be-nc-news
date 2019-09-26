@@ -5,7 +5,7 @@ exports.fetchUserByUsername = username => {
     .select('*')
     .where({ username })
     .then(([user]) => {
-      if (user === undefined) {
+      if (!user) {
         return Promise.reject({ status: 404, msg: 'User not found.' });
       } else {
         return user;
