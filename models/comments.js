@@ -35,16 +35,26 @@ exports.fetchCommentsByArticleId = (
       msg: 'Bad request - `article_id` must be a number.'
     });
   } else {
-    return connection('comments')
+    return connection('articles')
       .select('*')
       .where({ article_id })
-      .orderBy(sort_by, order)
-      .then(comments => {
-        if (comments.length < 1) {
+      .then(([article]) => {
+        if (!article) {
           return Promise.reject({ status: 404, msg: 'Article not found.' });
-        } else {
-          return comments;
         }
+      })
+      .then(() => {
+        return connection('comments')
+          .select('*')
+          .where({ article_id })
+          .orderBy(sort_by, order)
+          .then(comments => {
+            if (comments.length < 1) {
+              return Promise.reject({ status: 404, msg: 'Article not found.' });
+            } else {
+              return comments;
+            }
+          });
       });
   }
 };

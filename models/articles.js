@@ -41,20 +41,56 @@ exports.fetchAllArticles = (
   author,
   topic
 ) => {
-  return connection('articles')
-    .select('articles.*')
-    .count({ comment_count: 'comment_id' })
-    .leftJoin('comments', 'articles.article_id', 'comments.article_id')
-    .groupBy('articles.article_id')
-    .orderBy(sort_by, order)
-    .modify(query => {
-      if (author) query.where('articles.author', author);
-      if (topic) query.where('articles.topic', topic);
-    })
-    .then(articles => {
-      articles.forEach(article => {
-        article.comment_count = +article.comment_count;
+  return new Promise((resolve, reject) => {
+    if (author) {
+      return connection('users')
+        .select('*')
+        .where({ username: author })
+        .then(([author]) => {
+          if (!author) {
+            reject({ status: 404, msg: 'Author not found.' });
+          } else {
+            resolve();
+          }
+        });
+    } else {
+      resolve();
+    }
+  })
+    .then(() => {
+      return new Promise((resolve, reject) => {
+        if (topic) {
+          return connection('topics')
+            .select('*')
+            .where({ slug: topic })
+            .then(([topic]) => {
+              if (!topic) {
+                reject({ status: 404, msg: 'Topic not found.' });
+              } else {
+                resolve();
+              }
+            });
+        } else {
+          resolve();
+        }
       });
-      return articles;
+    })
+    .then(() => {
+      return connection('articles')
+        .select('articles.*')
+        .count({ comment_count: 'comment_id' })
+        .leftJoin('comments', 'articles.article_id', 'comments.article_id')
+        .groupBy('articles.article_id')
+        .orderBy(sort_by, order)
+        .modify(query => {
+          if (author) query.where('articles.author', author);
+          if (topic) query.where('articles.topic', topic);
+        })
+        .then(articles => {
+          articles.forEach(article => {
+            article.comment_count = +article.comment_count;
+          });
+          return articles;
+        });
     });
 };

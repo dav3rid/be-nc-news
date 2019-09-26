@@ -221,6 +221,22 @@ describe('/api', () => {
                 expect(msg).to.equal('Bad request - invalid query.');
               });
           });
+          it('status: 404, where author does not exist', () => {
+            return request(app)
+              .get('/api/articles?author=TEST_AUTHOR')
+              .expect(404)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal('Author not found.');
+              });
+          });
+          it('status: 404, where topic does not exist', () => {
+            return request(app)
+              .get('/api/articles?topic=TEST_TOPIC')
+              .expect(404)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal('Topic not found.');
+              });
+          });
         });
       });
     });
