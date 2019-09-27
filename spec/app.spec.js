@@ -349,7 +349,7 @@ describe('/api', () => {
               expect(article.comment_count).to.equal(13);
             });
         });
-        it.only('status: 200, defaults `inc_votes` to 0 where `inc_votes` is not passed', () => {
+        it('status: 200, defaults `inc_votes` to 0 where `inc_votes` is not passed', () => {
           return request(app)
             .patch('/api/articles/1')
             .send({ testKey: 10 })
