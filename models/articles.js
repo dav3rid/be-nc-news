@@ -18,21 +18,21 @@ const fetchArticleById = article_id => {
 };
 exports.fetchArticleById = fetchArticleById;
 
-exports.updateArticleById = (article_id, inc_votes) => {
-  if (typeof inc_votes !== 'number') {
-    return Promise.reject({
-      status: 400,
-      msg: 'Bad request - `inc_votes` must be a number.'
+exports.updateArticleById = (article_id, inc_votes = 0) => {
+  // if (typeof inc_votes !== 'number') {
+  //   return Promise.reject({
+  //     status: 400,
+  //     msg: 'Bad request - `inc_votes` must be a number.'
+  //   });
+  // } else {
+  // }
+  return connection('articles')
+    .where({ article_id })
+    .increment({ votes: inc_votes })
+    .returning('*')
+    .then(() => {
+      return fetchArticleById(article_id);
     });
-  } else {
-    return connection('articles')
-      .where({ article_id })
-      .increment({ votes: inc_votes })
-      .returning('*')
-      .then(() => {
-        return fetchArticleById(article_id);
-      });
-  }
 };
 
 exports.fetchAllArticles = (
