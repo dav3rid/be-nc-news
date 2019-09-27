@@ -431,25 +431,10 @@ describe('/api', () => {
               })
               .expect(400)
               .then(({ body: { msg } }) => {
-                expect(msg).to.equal(
-                  'Bad request - `article_id` must be a number.'
-                );
+                expect(msg).to.equal('Bad request.');
               });
           });
-          it('status: 400, where request body object contains invalid values', () => {
-            return request(app)
-              .post('/api/articles/1/comments')
-              .send({
-                username: 12,
-                body: 'This is a test comment, a comment about testing'
-              })
-              .expect(400)
-              .then(({ body: { msg } }) => {
-                expect(msg).to.equal(
-                  'Bad request - input values must be strings.'
-                );
-              });
-          });
+
           it('status: 400, where request body object is missing `username` or `body` keys', () => {
             return request(app)
               .post('/api/articles/1/comments')
@@ -459,9 +444,19 @@ describe('/api', () => {
               })
               .expect(400)
               .then(({ body: { msg } }) => {
-                expect(msg).to.equal(
-                  'Bad request - input must have keys `username` and `body`.'
-                );
+                expect(msg).to.equal('Bad request.');
+              });
+          });
+          it('status: 422, where request body object contains invalid values', () => {
+            return request(app)
+              .post('/api/articles/1/comments')
+              .send({
+                username: 12,
+                body: 'This is a test comment, a comment about testing'
+              })
+              .expect(422)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal('Unprocessable entity.');
               });
           });
           it('status: 422, where article referenced in another table does not exist', () => {
@@ -493,9 +488,7 @@ describe('/api', () => {
               .get('/api/articles/INVALID/comments')
               .expect(400)
               .then(({ body: { msg } }) => {
-                expect(msg).to.equal(
-                  'Bad request - `article_id` must be a number.'
-                );
+                expect(msg).to.equal('Bad request.');
               });
           });
           it('status: 404, where given article_id is valid but does not exist', () => {
@@ -612,9 +605,7 @@ describe('/api', () => {
             .send({ testKey: 10 })
             .expect(400)
             .then(({ body: { msg } }) => {
-              expect(msg).to.equal(
-                'Bad request - `inc_votes` must be a number.'
-              );
+              expect(msg).to.equal('Bad request.');
             });
         });
         it('status: 400, where request body object has invalid value for `inc_votes`', () => {
@@ -623,9 +614,7 @@ describe('/api', () => {
             .send({ inc_votes: 'hello' })
             .expect(400)
             .then(({ body: { msg } }) => {
-              expect(msg).to.equal(
-                'Bad request - `inc_votes` must be a number.'
-              );
+              expect(msg).to.equal('Bad request.');
             });
         });
         it('status: 404, where comment does not exist', () => {
