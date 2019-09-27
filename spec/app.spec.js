@@ -349,7 +349,7 @@ describe('/api', () => {
               expect(article.comment_count).to.equal(13);
             });
         });
-        it('status: 200, defaults `inc_votes` to 0 where `inc_votes` is not passed', () => {
+        it('status: 200, defaults `inc_votes` to 0 where `inc_votes` is not passed and responds with the UNCHANGED article', () => {
           return request(app)
             .patch('/api/articles/1')
             .send({ testKey: 10 })
@@ -590,6 +590,15 @@ describe('/api', () => {
               expect(comment.votes).to.equal(-84);
             });
         });
+        it('status: 200, defaults `inc_votes` to 0 where `inc_votes` is not passed and responds with the UNCHANGED comment', () => {
+          return request(app)
+            .patch('/api/comments/1')
+            .send({ testKey: 10 })
+            .expect(200)
+            .then(({ body: { comment } }) => {
+              expect(comment.votes).to.equal(16);
+            });
+        });
         it('status: 400, where given article_id is invalid', () => {
           return request(app)
             .patch('/api/comments/INVALID')
@@ -599,15 +608,7 @@ describe('/api', () => {
               expect(msg).to.equal('Bad request.');
             });
         });
-        it('status: 400, where request body object has no `inc_votes` key', () => {
-          return request(app)
-            .patch('/api/comments/1')
-            .send({ testKey: 10 })
-            .expect(400)
-            .then(({ body: { msg } }) => {
-              expect(msg).to.equal('Bad request.');
-            });
-        });
+
         it('status: 400, where request body object has invalid value for `inc_votes`', () => {
           return request(app)
             .patch('/api/comments/1')
