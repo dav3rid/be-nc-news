@@ -83,3 +83,7 @@ exports.fetchAllArticles = (
     return articles;
   });
 };
+
+exports.addArticle = articleObj => {
+  return connection('articles').insert(articleObj, '*');
+};

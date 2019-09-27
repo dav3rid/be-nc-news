@@ -272,9 +272,60 @@ describe('/api', () => {
         });
       });
     });
+    describe.only('POST', () => {
+      it('status: 201, responds with the posted article', () => {
+        return request(app)
+          .post('/api/articles')
+          .send({
+            title: 'The Struggles of Uploading an Article',
+            body:
+              'Some gripping information on the subject declared in the title',
+            topic: 'mitch',
+            author: 'butter_bridge'
+          })
+          .expect(201)
+          .then(({ body: { article } }) => {
+            expect(article.author).to.equal('butter_bridge');
+            expect(article.article_id).to.equal(13);
+            expect(article.body).to.equal(
+              'Some gripping information on the subject declared in the title'
+            );
+          });
+      });
+      it('status: 422, where given author is not found in another table', () => {
+        return request(app)
+          .post('/api/articles')
+          .send({
+            title: 'The Struggles of Uploading an Article',
+            body:
+              'Some gripping information on the subject declared in the title',
+            topic: 'mitch',
+            author: 'I AM NOT REAL'
+          })
+          .expect(422)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal('Unprocessable entity.');
+          });
+      });
+      it('status: 422, where given topic is not found in another table', () => {
+        return request(app)
+          .post('/api/articles')
+          .send({
+            title: 'The Struggles of Uploading an Article',
+            body:
+              'Some gripping information on the subject declared in the title',
+            topic: 'Something Random',
+            author: 'butter_bridge'
+          })
+          .expect(422)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal('Unprocessable entity.');
+          });
+      });
+    });
     describe('INVALID METHODS', () => {
-      it('status: 405, for methods DELETE, PATCH, PUT, POST', () => {
-        const invalidMethods = ['delete', 'patch', 'put', 'post'];
+      it('status: 405, for methods DELETE, PATCH, PUT', () => {
+        const invalidMethods = ['delete', 'patch', 'put'];
         const promises = invalidMethods.map(method => {
           return request(app)
             [method]('/api/articles')
