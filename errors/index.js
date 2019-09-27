@@ -5,14 +5,13 @@ exports.handleCustomErrors = (err, req, res, next) => {
 
 exports.handlePsql400Errors = (err, req, res, next) => {
   const codes = ['22P02', '42703'];
-  if (codes.includes(err.code))
-    res.status(400).send({ msg: err.msg || 'Bad request.' });
+  if (codes.includes(err.code)) res.status(400).send({ msg: 'Bad request.' });
   else next(err);
 };
 exports.handlePsql422Errors = (err, req, res, next) => {
   const codes = ['23503'];
   if (codes.includes(err.code))
-    res.status(422).send({ msg: err.msg || 'Unprocessable entity.' });
+    res.status(422).send({ msg: 'Unprocessable entity.' });
   else next(err);
 };
 

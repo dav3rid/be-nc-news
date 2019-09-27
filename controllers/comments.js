@@ -25,12 +25,7 @@ exports.getCommentsByArticleId = (req, res, next) => {
     .then(comments => {
       res.status(200).send({ comments });
     })
-    .catch(err => {
-      if (!err.msg) {
-        err.msg = 'Bad request - invalid query.';
-      }
-      next(err);
-    });
+    .catch(next);
 };
 
 exports.patchCommentById = (req, res, next) => {

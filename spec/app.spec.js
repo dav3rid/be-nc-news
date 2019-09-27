@@ -250,7 +250,7 @@ describe('/api', () => {
               .get('/api/articles?sort_by=tallest_author')
               .expect(400)
               .then(({ body: { msg } }) => {
-                expect(msg).to.equal('Bad request - invalid query.');
+                expect(msg).to.equal('Bad request.');
               });
           });
           it('status: 404, where author does not exist', () => {
@@ -331,10 +331,10 @@ describe('/api', () => {
             .patch('/api/articles/1')
             .send(input)
             .expect(200)
-            .then(({ body: { updatedArticle } }) => {
-              expect(updatedArticle.votes).to.equal(150);
-              expect(updatedArticle.topic).to.equal('mitch');
-              expect(updatedArticle.comment_count).to.equal(13);
+            .then(({ body: { article } }) => {
+              expect(article.votes).to.equal(150);
+              expect(article.topic).to.equal('mitch');
+              expect(article.comment_count).to.equal(13);
             });
         });
         it('status: 200, responds with the updated article (decrement votes)', () => {
@@ -343,10 +343,10 @@ describe('/api', () => {
             .patch('/api/articles/1')
             .send(input)
             .expect(200)
-            .then(({ body: { updatedArticle } }) => {
-              expect(updatedArticle.votes).to.equal(95);
-              expect(updatedArticle.topic).to.equal('mitch');
-              expect(updatedArticle.comment_count).to.equal(13);
+            .then(({ body: { article } }) => {
+              expect(article.votes).to.equal(95);
+              expect(article.topic).to.equal('mitch');
+              expect(article.comment_count).to.equal(13);
             });
         });
         it('status: 400, where given article_id is invalid', () => {
@@ -553,7 +553,7 @@ describe('/api', () => {
                 .get('/api/articles/1/comments?sort_by=tallest_author')
                 .expect(400)
                 .then(({ body: { msg } }) => {
-                  expect(msg).to.equal('Bad request - invalid query.');
+                  expect(msg).to.equal('Bad request.');
                 });
             });
           });
