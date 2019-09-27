@@ -59,23 +59,27 @@ exports.fetchAllArticles = (
   author,
   topic
 ) => {
-  return Promise.all([checkIfAuthorExists(author), checkIfTopicExists(topic)])
-    .then(() => {
-      return connection('articles')
-        .select('articles.*')
-        .count({ comment_count: 'comment_id' })
-        .leftJoin('comments', 'articles.article_id', 'comments.article_id')
-        .groupBy('articles.article_id')
-        .orderBy(sort_by, order)
-        .modify(query => {
-          if (author) query.where('articles.author', author);
-          if (topic) query.where('articles.topic', topic);
-        });
-    })
-    .then(articles => {
-      articles.forEach(article => {
-        article.comment_count = +article.comment_count;
+  const fetchPromise = () => {
+    return connection('articles')
+      .select('articles.*')
+      .count({ comment_count: 'comment_id' })
+      .leftJoin('comments', 'articles.article_id', 'comments.article_id')
+      .groupBy('articles.article_id')
+      .orderBy(sort_by, order)
+      .modify(query => {
+        if (author) query.where('articles.author', author);
+        if (topic) query.where('articles.topic', topic);
       });
-      return articles;
+  };
+
+  return Promise.all([
+    fetchPromise(),
+    checkIfAuthorExists(author),
+    checkIfTopicExists(topic)
+  ]).then(([articles]) => {
+    articles.forEach(article => {
+      article.comment_count = +article.comment_count;
     });
+    return articles;
+  });
 };
