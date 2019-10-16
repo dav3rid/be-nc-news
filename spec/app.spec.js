@@ -272,7 +272,7 @@ describe('/api', () => {
         });
       });
     });
-    describe.only('POST', () => {
+    describe('POST', () => {
       it('status: 201, responds with the posted article', () => {
         return request(app)
           .post('/api/articles')
@@ -727,5 +727,13 @@ describe('/api', () => {
           expect(msg).to.equal('Page not found.');
         });
     });
+  });
+  describe.only('getAllUsers', () => {
+    return request(app)
+      .get('/api/users')
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).to.equal('Page not found.');
+      });
   });
 });

@@ -12,3 +12,7 @@ exports.fetchUserByUsername = username => {
       }
     });
 };
+
+exports.fetchAllUsers = () => {
+  return connection('users').select('*');
+};
