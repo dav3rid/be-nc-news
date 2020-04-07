@@ -16,3 +16,7 @@ exports.fetchUserByUsername = username => {
 exports.fetchAllUsers = () => {
   return connection('users').select('*');
 };
+
+exports.addUser = user => {
+  return connection('users').insert(user, '*');
+};

@@ -7,7 +7,7 @@ const {
   handlePsql400Errors,
   handlePsql422Errors,
   handle404s,
-  handle500s
+  handle500s,
 } = require('./errors');
 
 app.use(cors());

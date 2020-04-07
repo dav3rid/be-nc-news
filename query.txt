@@ -1,0 +1,37 @@
+You are now connected to database "card_game_test" as user "northcoders7".
+You are now connected to database "card_game_test" as user "northcoders7".
+ user_id | name 
+---------+------
+       1 | Dave
+       2 | Bill
+(2 rows)
+
+ game_id | title  | host_id |      game_state      |          created_at           
+---------+--------+---------+----------------------+-------------------------------
+       1 | game 1 |       1 | stuff is going well! | 2020-04-07 18:47:52.524558+01
+(1 row)
+
+You are now connected to database "card_game_test" as user "northcoders7".
+ user_id | name 
+---------+------
+       1 | Dave
+       2 | Bill
+(2 rows)
+
+ game_id | title  | host_id |      game_state      |          created_at           
+---------+--------+---------+----------------------+-------------------------------
+       1 | game 1 |       1 | stuff is going well! | 2020-04-07 18:47:52.524558+01
+(1 row)
+
+You are now connected to database "card_game_test" as user "northcoders7".
+ user_id | name 
+---------+------
+       1 | Dave
+       2 | Bill
+(2 rows)
+
+ game_id | title  | host_id |                     game_state                      |          created_at          
+---------+--------+---------+-----------------------------------------------------+------------------------------
+       1 | game 1 |       1 | {"hostHand":["AH","3C"],"opponentHand":["5D","9S"]} | 2020-04-07 18:52:53.57152+01
+(1 row)
+
