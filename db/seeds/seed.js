@@ -1,4 +1,4 @@
-const { userData, gameData } = require('../data');
+const { userData, gameData } = require('../data/test');
 
 exports.seed = connection => {
   return connection.migrate
