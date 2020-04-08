@@ -113,6 +113,8 @@ describe('/api', () => {
           })
           .expect(201)
           .then(({ body: { game } }) => {
+            expect(game.game_id).to.equal(4);
+            expect(game.host_id).to.equal(1);
             expect(game.game_state).to.eql({
               hostFinalThree: ['JC', '3S', '9D'],
               opponentFinalThree: ['AD', '4H', '6C'],
@@ -124,14 +126,12 @@ describe('/api', () => {
               pickUpDeck: [],
               burnedDeck: [],
             });
-            expect(game.game_id).to.equal(4);
-            expect(game.host_id).to.equal(1);
           });
       });
     });
     describe('INVALID METHODS', () => {
-      it('status: 405, for methods DELETE, PATCH, PUT', () => {
-        const invalidMethods = ['delete', 'patch', 'put'];
+      it('status: 405, for methods DELETE, PUT, PATCH', () => {
+        const invalidMethods = ['delete', 'put', 'patch'];
         const promises = invalidMethods.map(method => {
           return request(app)
             [method]('/api/games')
@@ -154,10 +154,42 @@ describe('/api', () => {
             });
         });
       });
-
+      describe('PATCH', () => {
+        it('status: 200, responds with an updated game', () => {
+          return request(app)
+            .patch('/api/games/2')
+            .send({
+              hostFinalThree: ['AC'],
+              opponentFinalThree: ['AD', '4H', '6C'],
+              hostPenultimateThree: [],
+              opponentPenultimateThree: [],
+              hostHand: [],
+              opponentHand: [],
+              playableDeck: [],
+              pickUpDeck: [],
+              burnedDeck: [],
+            })
+            .expect(200)
+            .then(({ body: { game } }) => {
+              expect(game.game_id).to.equal(2);
+              expect(game.host_id).to.equal(2);
+              expect(game.game_state).to.eql({
+                hostFinalThree: ['AC'],
+                opponentFinalThree: ['AD', '4H', '6C'],
+                hostPenultimateThree: [],
+                opponentPenultimateThree: [],
+                hostHand: [],
+                opponentHand: [],
+                playableDeck: [],
+                pickUpDeck: [],
+                burnedDeck: [],
+              });
+            });
+        });
+      });
       describe('INVALID METHODS', () => {
-        it('status: 405, for methods DELETE, PATCH, POST, PUT', () => {
-          const invalidMethods = ['delete', 'patch', 'put', 'post'];
+        it('status: 405, for methods DELETE, POST, PUT', () => {
+          const invalidMethods = ['delete', 'put', 'post'];
           const promises = invalidMethods.map(method => {
             return request(app)
               [method]('/api/games/1')

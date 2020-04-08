@@ -1,4 +1,9 @@
-const { fetchAllGames, fetchGameById, addGame } = require('../models/games');
+const {
+  fetchAllGames,
+  fetchGameById,
+  addGame,
+  updateGameById,
+} = require('../models/games');
 
 exports.getAllGames = (req, res, next) => {
   const { host_id } = req.query;
@@ -20,8 +25,21 @@ exports.getGameById = (req, res, next) => {
 
 exports.postGame = ({ body: { game_state, ...rest } }, res, next) => {
   const game = { game_state: JSON.stringify(game_state), ...rest };
-  addGame(game).then(([{ game_state, ...rest }]) => {
-    const game = { game_state: JSON.parse(game_state), ...rest };
-    res.status(201).send({ game });
-  });
+  addGame(game)
+    .then(([{ game_state, ...rest }]) => {
+      const game = { game_state: JSON.parse(game_state), ...rest };
+      res.status(201).send({ game });
+    })
+    .catch(next);
+};
+
+exports.patchGameById = (req, res, next) => {
+  const { game_id } = req.params;
+  const game_state = JSON.stringify(req.body);
+  updateGameById(game_id, game_state)
+    .then(([{ game_state, ...rest }]) => {
+      const game = { game_state: JSON.parse(game_state), ...rest };
+      res.status(200).send({ game });
+    })
+    .catch(next);
 };

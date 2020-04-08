@@ -1,6 +1,13 @@
 const gameState = {
-  hostHand: ['AH', '3C'],
-  opponentHand: ['5D', '9S'],
+  hostFinalThree: ['JC', '3S', '9D'],
+  opponentFinalThree: ['AD', '4H', '6C'],
+  hostPenultimateThree: [],
+  opponentPenultimateThree: [],
+  hostHand: ['9C', '4S', '7D', '2H', '5H', '3H'],
+  opponentHand: ['AS', '2S', '5S', '6S', '7S', '8S'],
+  playableDeck: [],
+  pickUpDeck: [],
+  burnedDeck: [],
 };
 
 module.exports = [

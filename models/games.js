@@ -15,3 +15,7 @@ exports.fetchGameById = game_id => {
 exports.addGame = game => {
   return connection('games').insert(game, '*');
 };
+
+exports.updateGameById = (game_id, game_state) => {
+  return connection('games').where({ game_id }).update({ game_state }, '*');
+};
