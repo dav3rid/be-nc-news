@@ -3,7 +3,9 @@ exports.up = connection => {
     articlesTable.increments('game_id').primary();
     articlesTable.string('title').notNullable();
     articlesTable.integer('host_id').references('users.user_id').notNullable();
-    articlesTable.text('game_state').notNullable();
+    articlesTable.integer('opponent_id').references('users.user_id');
+    articlesTable.integer('current_turn_id').references('users.user_id');
+    articlesTable.text('game_state').defaultsTo('{"msg":"no game state"}');
     articlesTable.timestamp('created_at').defaultsTo(connection.fn.now());
   });
 };

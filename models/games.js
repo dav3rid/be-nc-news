@@ -1,10 +1,11 @@
 const connection = require('../db/connection');
 
-exports.fetchAllGames = host_id => {
+exports.fetchGames = (host_id, available_only) => {
   return connection('games')
     .select('*')
     .modify(query => {
       if (host_id) query.where({ host_id });
+      if (available_only) query.where({ opponent_id: null });
     });
 };
 

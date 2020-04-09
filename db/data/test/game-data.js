@@ -14,16 +14,22 @@ module.exports = [
   {
     title: 'game 1',
     host_id: 1,
+    opponent_id: 2,
+    current_turn_id: 1,
     game_state: JSON.stringify(gameState),
   },
   {
     title: 'game 2',
     host_id: 2,
+    opponent_id: 1,
+    current_turn_id: 2,
     game_state: JSON.stringify(gameState),
   },
   {
     title: 'rando game',
     host_id: 2,
+    opponent_id: 1,
+    current_turn_id: 1,
     game_state: JSON.stringify(gameState),
   },
 ];

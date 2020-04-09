@@ -1,13 +1,13 @@
 const {
-  fetchAllGames,
+  fetchGames,
   fetchGameById,
   addGame,
   updateGameById,
 } = require('../models/games');
 
-exports.getAllGames = (req, res, next) => {
-  const { host_id } = req.query;
-  fetchAllGames(host_id)
+exports.getGames = (req, res, next) => {
+  const { host_id, available_only } = req.query;
+  fetchGames(host_id, available_only)
     .then(games => {
       res.status(200).send({ games });
     })
@@ -43,3 +43,9 @@ exports.patchGameById = (req, res, next) => {
     })
     .catch(next);
 };
+
+// exports.getAvailableGames = (req, res, next) => {
+//   fetchGames(null, true).then(games => {
+//     console.log(games);
+//   });
+// };

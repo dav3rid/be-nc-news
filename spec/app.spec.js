@@ -83,52 +83,61 @@ describe('/api', () => {
             expect(games.length).to.equal(3);
           });
       });
-      it('status: 200, responds with games belonging to a user', () => {
-        return request(app)
-          .get('/api/games?host_id=2')
-          .expect(200)
-          .then(({ body: { games } }) => {
-            expect(games.length).to.equal(2);
+      describe('QUERIES', () => {
+        it('status: 200, responds with games belonging to a user', () => {
+          return request(app)
+            .get('/api/games?host_id=2')
+            .expect(200)
+            .then(({ body: { games } }) => {
+              expect(games.length).to.equal(2);
+            });
+        });
+        it('status: 200, responds with an array of available games', () => {
+          const promises = [
+            request(app).post('/api/games').send({
+              title: 'a new test game',
+              host_id: 1,
+            }),
+            request(app).post('/api/games').send({
+              title: 'another game',
+              host_id: 1,
+            }),
+            request(app).post('/api/games').send({
+              title: 'getting lonely',
+              host_id: 1,
+            }),
+          ];
+          return Promise.all(promises).then(() => {
+            return request(app)
+              .get('/api/games?available_only=true')
+              .expect(200)
+              .then(({ body: { games } }) => {
+                expect(games.length).to.equal(3);
+              });
           });
+        });
       });
     });
     describe('POST', () => {
-      it('status: 201, responds with a new game', () => {
+      it('status: 201, responds with a new game - no game state', () => {
         return request(app)
           .post('/api/games')
           .send({
             title: 'a new test game',
             host_id: 1,
-            game_state: {
-              hostFinalThree: ['JC', '3S', '9D'],
-              opponentFinalThree: ['AD', '4H', '6C'],
-              hostPenultimateThree: [],
-              opponentPenultimateThree: [],
-              hostHand: ['9C', '4S', '7D', '2H', '5H', '3H'],
-              opponentHand: ['AS', '2S', '5S', '6S', '7S', '8S'],
-              playableDeck: [],
-              pickUpDeck: [],
-              burnedDeck: [],
-            },
           })
           .expect(201)
           .then(({ body: { game } }) => {
             expect(game.game_id).to.equal(4);
             expect(game.host_id).to.equal(1);
-            expect(game.game_state).to.eql({
-              hostFinalThree: ['JC', '3S', '9D'],
-              opponentFinalThree: ['AD', '4H', '6C'],
-              hostPenultimateThree: [],
-              opponentPenultimateThree: [],
-              hostHand: ['9C', '4S', '7D', '2H', '5H', '3H'],
-              opponentHand: ['AS', '2S', '5S', '6S', '7S', '8S'],
-              playableDeck: [],
-              pickUpDeck: [],
-              burnedDeck: [],
-            });
+            expect(game.opponent_id).to.equal(null);
+            expect(game.current_turn_id).to.equal(null);
+            expect(game.title).to.equal('a new test game');
+            expect(game.game_state).to.eql({ msg: 'no game state' });
           });
       });
     });
+    // get list of all games where opponent id is null for waiting hosts
     describe('INVALID METHODS', () => {
       it('status: 405, for methods DELETE, PUT, PATCH', () => {
         const invalidMethods = ['delete', 'put', 'patch'];
@@ -173,6 +182,8 @@ describe('/api', () => {
             .then(({ body: { game } }) => {
               expect(game.game_id).to.equal(2);
               expect(game.host_id).to.equal(2);
+              expect(game.opponent_id).to.equal(1);
+              expect(game.current_turn_id).to.equal(2);
               expect(game.game_state).to.eql({
                 hostFinalThree: ['AC'],
                 opponentFinalThree: ['AD', '4H', '6C'],
