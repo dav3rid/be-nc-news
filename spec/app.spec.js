@@ -241,7 +241,7 @@ describe('/api', () => {
         });
       });
       describe('INVALID METHODS', () => {
-        it('status: 405, for methods POST, PUT', () => {
+        it('status: 405, for methods DELETE, POST, PUT', () => {
           const invalidMethods = ['put', 'post'];
           const promises = invalidMethods.map(method => {
             return request(app)

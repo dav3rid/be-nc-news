@@ -46,7 +46,9 @@ exports.patchGameById = (req, res, next) => {
 
 exports.deleteGameById = (req, res, next) => {
   const { game_id } = req.params;
-  eraseGameById(game_id).then(() => {
-    res.sendStatus(204);
-  });
+  eraseGameById(game_id)
+    .then(() => {
+      res.sendStatus(204);
+    })
+    .catch(next);
 };
