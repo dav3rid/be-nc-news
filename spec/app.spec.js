@@ -84,7 +84,7 @@ describe('/api', () => {
           });
       });
       describe('QUERIES', () => {
-        it('status: 200, responds with games belonging to a user', () => {
+        it('`host_id=2` responds with games belonging to a user', () => {
           return request(app)
             .get('/api/games?host_id=2')
             .expect(200)
@@ -92,7 +92,7 @@ describe('/api', () => {
               expect(games.length).to.equal(2);
             });
         });
-        it('status: 200, responds with an array of available games', () => {
+        it('`available=true` responds with an array of available games', () => {
           const promises = [
             request(app).post('/api/games').send({
               title: 'a new test game',
@@ -109,7 +109,7 @@ describe('/api', () => {
           ];
           return Promise.all(promises).then(() => {
             return request(app)
-              .get('/api/games?available_only=true')
+              .get('/api/games?available=true')
               .expect(200)
               .then(({ body: { games } }) => {
                 expect(games.length).to.equal(3);
@@ -137,7 +137,6 @@ describe('/api', () => {
           });
       });
     });
-    // get list of all games where opponent id is null for waiting hosts
     describe('INVALID METHODS', () => {
       it('status: 405, for methods DELETE, PUT, PATCH', () => {
         const invalidMethods = ['delete', 'put', 'patch'];
@@ -162,21 +161,33 @@ describe('/api', () => {
               expect(game).to.contain.keys('title', 'host_id', 'game_state');
             });
         });
+        describe('ERRORS', () => {
+          it('staus: 404, GAME NOT FOUND', () => {
+            return request(app)
+              .get('/api/games/999')
+              .expect(404)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal('Game not found.');
+              });
+          });
+        });
       });
       describe('PATCH', () => {
-        it('status: 200, responds with an updated game', () => {
+        it('MOVE, responds with an updated game_state', () => {
           return request(app)
             .patch('/api/games/2')
             .send({
-              hostFinalThree: ['AC'],
-              opponentFinalThree: ['AD', '4H', '6C'],
-              hostPenultimateThree: [],
-              opponentPenultimateThree: [],
-              hostHand: [],
-              opponentHand: [],
-              playableDeck: [],
-              pickUpDeck: [],
-              burnedDeck: [],
+              game_state: {
+                hostFinalThree: ['AC'],
+                opponentFinalThree: ['AD', '4H', '6C'],
+                hostPenultimateThree: [],
+                opponentPenultimateThree: [],
+                hostHand: [],
+                opponentHand: [],
+                playableDeck: [],
+                pickUpDeck: [],
+                burnedDeck: [],
+              },
             })
             .expect(200)
             .then(({ body: { game } }) => {
@@ -197,10 +208,41 @@ describe('/api', () => {
               });
             });
         });
+        it('JOIN, joins available game - responds with updated opponent_id ', () => {
+          return request(app)
+            .post('/api/games')
+            .send({
+              title: 'a new test game',
+              host_id: 1,
+            })
+            .then(() => {
+              return request(app)
+                .patch('/api/games/4')
+                .send({ opponent_id: 2 })
+                .expect(200)
+                .then(({ body: { game } }) => {
+                  expect(game.game_id).to.equal(4);
+                  expect(game.host_id).to.equal(1);
+                  expect(game.opponent_id).to.equal(2);
+                  expect(game.current_turn_id).to.equal(null);
+                  expect(game.game_state).to.eql({ msg: 'no game state' });
+                });
+            });
+        });
+      });
+      describe('DELETE', () => {
+        it('status: 204, deletes a game', () => {
+          return request(app)
+            .delete('/api/games/1')
+            .expect(204)
+            .then(() => {
+              return request(app).get('/api/games/1').expect(404);
+            });
+        });
       });
       describe('INVALID METHODS', () => {
-        it('status: 405, for methods DELETE, POST, PUT', () => {
-          const invalidMethods = ['delete', 'put', 'post'];
+        it('status: 405, for methods POST, PUT', () => {
+          const invalidMethods = ['put', 'post'];
           const promises = invalidMethods.map(method => {
             return request(app)
               [method]('/api/games/1')

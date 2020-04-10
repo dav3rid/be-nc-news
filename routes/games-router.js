@@ -4,6 +4,7 @@ const {
   getGameById,
   postGame,
   patchGameById,
+  deleteGameById,
 } = require('../controllers/games');
 const { handle405s } = require('../errors');
 
@@ -13,6 +14,7 @@ gamesRouter
   .route('/:game_id')
   .get(getGameById)
   .patch(patchGameById)
+  .delete(deleteGameById)
   .all(handle405s);
 
 module.exports = gamesRouter;

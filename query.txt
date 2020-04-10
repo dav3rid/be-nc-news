@@ -1,51 +1,32 @@
-You are now connected to database "card_game_test" as user "northcoders7".
-You are now connected to database "card_game_test" as user "northcoders7".
+You are now connected to database "card_game" as user "northcoders7".
+ user_id | name 
+---------+------
+(0 rows)
+
+ game_id | title | host_id | opponent_id | current_turn_id | game_state | created_at 
+---------+-------+---------+-------------+-----------------+------------+------------
+(0 rows)
+
+You are now connected to database "card_game" as user "northcoders7".
  user_id | name 
 ---------+------
        1 | Dave
        2 | Bill
 (2 rows)
 
- game_id | title  | host_id |      game_state      |          created_at           
----------+--------+---------+----------------------+-------------------------------
-       1 | game 1 |       1 | stuff is going well! | 2020-04-07 18:47:52.524558+01
-(1 row)
-
-You are now connected to database "card_game_test" as user "northcoders7".
- user_id | name 
----------+------
-       1 | Dave
-       2 | Bill
-(2 rows)
-
- game_id | title  | host_id |      game_state      |          created_at           
----------+--------+---------+----------------------+-------------------------------
-       1 | game 1 |       1 | stuff is going well! | 2020-04-07 18:47:52.524558+01
-(1 row)
-
-You are now connected to database "card_game_test" as user "northcoders7".
- user_id | name 
----------+------
-       1 | Dave
-       2 | Bill
-(2 rows)
-
- game_id | title  | host_id |                     game_state                      |          created_at          
----------+--------+---------+-----------------------------------------------------+------------------------------
-       1 | game 1 |       1 | {"hostHand":["AH","3C"],"opponentHand":["5D","9S"]} | 2020-04-07 18:52:53.57152+01
-(1 row)
-
-You are now connected to database "card_game_test" as user "northcoders7".
- user_id | name 
----------+------
-       1 | Dave
-       2 | Bill
-(2 rows)
-
- game_id |   title    | host_id | opponent_id | current_turn_id |                                                                                                                                  game_state                                                                                                                                   |          created_at           
----------+------------+---------+-------------+-----------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------
-       1 | game 1     |       1 |           2 |               1 | {"hostFinalThree":["JC","3S","9D"],"opponentFinalThree":["AD","4H","6C"],"hostPenultimateThree":[],"opponentPenultimateThree":[],"hostHand":["9C","4S","7D","2H","5H","3H"],"opponentHand":["AS","2S","5S","6S","7S","8S"],"playableDeck":[],"pickUpDeck":[],"burnedDeck":[]} | 2020-04-09 23:35:19.707371+01
-       2 | game 2     |       2 |           1 |               2 | {"hostFinalThree":["JC","3S","9D"],"opponentFinalThree":["AD","4H","6C"],"hostPenultimateThree":[],"opponentPenultimateThree":[],"hostHand":["9C","4S","7D","2H","5H","3H"],"opponentHand":["AS","2S","5S","6S","7S","8S"],"playableDeck":[],"pickUpDeck":[],"burnedDeck":[]} | 2020-04-09 23:35:19.707371+01
-       3 | rando game |       2 |           1 |               1 | {"hostFinalThree":["JC","3S","9D"],"opponentFinalThree":["AD","4H","6C"],"hostPenultimateThree":[],"opponentPenultimateThree":[],"hostHand":["9C","4S","7D","2H","5H","3H"],"opponentHand":["AS","2S","5S","6S","7S","8S"],"playableDeck":[],"pickUpDeck":[],"burnedDeck":[]} | 2020-04-09 23:35:19.707371+01
+ game_id |   title    | host_id | opponent_id | current_turn_id |                                                                                                                                  game_state                                                                                                                                   |          created_at          
+---------+------------+---------+-------------+-----------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------
+       1 | game 1     |       1 |           2 |               1 | {"hostFinalThree":["JC","3S","9D"],"opponentFinalThree":["AD","4H","6C"],"hostPenultimateThree":[],"opponentPenultimateThree":[],"hostHand":["9C","4S","7D","2H","5H","3H"],"opponentHand":["AS","2S","5S","6S","7S","8S"],"playableDeck":[],"pickUpDeck":[],"burnedDeck":[]} | 2020-04-10 18:07:19.80275+01
+       2 | game 2     |       2 |           1 |               2 | {"hostFinalThree":["JC","3S","9D"],"opponentFinalThree":["AD","4H","6C"],"hostPenultimateThree":[],"opponentPenultimateThree":[],"hostHand":["9C","4S","7D","2H","5H","3H"],"opponentHand":["AS","2S","5S","6S","7S","8S"],"playableDeck":[],"pickUpDeck":[],"burnedDeck":[]} | 2020-04-10 18:07:19.80275+01
+       3 | rando game |       2 |           1 |               1 | {"hostFinalThree":["JC","3S","9D"],"opponentFinalThree":["AD","4H","6C"],"hostPenultimateThree":[],"opponentPenultimateThree":[],"hostHand":["9C","4S","7D","2H","5H","3H"],"opponentHand":["AS","2S","5S","6S","7S","8S"],"playableDeck":[],"pickUpDeck":[],"burnedDeck":[]} | 2020-04-10 18:07:19.80275+01
 (3 rows)
+
+You are now connected to database "card_game" as user "northcoders7".
+ user_id | name 
+---------+------
+(0 rows)
+
+ game_id | title | host_id | opponent_id | current_turn_id | game_state | created_at 
+---------+-------+---------+-------------+-----------------+------------+------------
+(0 rows)
 

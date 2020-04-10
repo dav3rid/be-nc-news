@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "setup-dbs": "psql -f ./db/setup.sql",
+    "clear-db": "npm run setup-dbs && npm run migrate-latest",
     "query": "psql -f ./db/query.sql >> query.txt",
     "seed": "knex seed:run",
     "seed-test": "NODE_ENV=test knex seed:run",
