@@ -2,7 +2,7 @@ process.env.NODE_ENV = 'test';
 const chai = require('chai');
 const { expect } = chai;
 chai.use(require('chai-sorted'));
-const app = require('../app');
+const { app } = require('../app');
 const request = require('supertest');
 const connection = require('../db/connection');
 
@@ -17,7 +17,7 @@ describe('/api', () => {
           .get('/api/users')
           .expect(200)
           .then(({ body: { users } }) => {
-            expect(users.length).to.equal(2);
+            expect(users.length).to.equal(5);
           });
       });
     });
@@ -28,7 +28,7 @@ describe('/api', () => {
           .send({ name: 'Barry' })
           .expect(201)
           .then(({ body: { user } }) => {
-            expect(user).to.eql({ user_id: 3, name: 'Barry' });
+            expect(user).to.eql({ user_id: 6, name: 'Barry' });
           });
       });
     });
@@ -80,7 +80,7 @@ describe('/api', () => {
           .get('/api/games')
           .expect(200)
           .then(({ body: { games } }) => {
-            expect(games.length).to.equal(3);
+            expect(games.length).to.equal(2);
           });
       });
       describe('QUERIES', () => {
@@ -89,22 +89,22 @@ describe('/api', () => {
             .get('/api/games?host_id=2')
             .expect(200)
             .then(({ body: { games } }) => {
-              expect(games.length).to.equal(2);
+              expect(games.length).to.equal(1);
             });
         });
         it('`available=true` responds with an array of available games', () => {
           const promises = [
             request(app).post('/api/games').send({
               title: 'a new test game',
-              host_id: 1,
+              host_id: 3,
             }),
             request(app).post('/api/games').send({
               title: 'another game',
-              host_id: 1,
+              host_id: 4,
             }),
             request(app).post('/api/games').send({
               title: 'getting lonely',
-              host_id: 1,
+              host_id: 5,
             }),
           ];
           return Promise.all(promises).then(() => {
@@ -124,17 +124,37 @@ describe('/api', () => {
           .post('/api/games')
           .send({
             title: 'a new test game',
-            host_id: 1,
+            host_id: 3,
           })
           .expect(201)
           .then(({ body: { game } }) => {
-            expect(game.game_id).to.equal(4);
-            expect(game.host_id).to.equal(1);
+            expect(game.game_id).to.equal(3);
+            expect(game.host_id).to.equal(3);
             expect(game.opponent_id).to.equal(null);
             expect(game.current_turn_id).to.equal(null);
             expect(game.title).to.equal('a new test game');
             expect(game.game_state).to.eql({ msg: 'no game state' });
           });
+      });
+      describe('ERRORS', () => {
+        it('status: 422, host does not exist', () => {
+          return request(app)
+            .post('/api/games')
+            .send({ title: 'Test Title', host_id: 999 })
+            .expect(422)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal('Unprocessable entity.');
+            });
+        });
+        it('status: 400, host must be unique', () => {
+          return request(app)
+            .post('/api/games')
+            .send({ title: 'A new game', host_id: 1 })
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal('Bad request.');
+            });
+        });
       });
     });
     describe('INVALID METHODS', () => {
@@ -213,21 +233,46 @@ describe('/api', () => {
             .post('/api/games')
             .send({
               title: 'a new test game',
-              host_id: 1,
+              host_id: 5,
             })
             .then(() => {
               return request(app)
-                .patch('/api/games/4')
+                .patch('/api/games/3')
                 .send({ opponent_id: 2 })
                 .expect(200)
                 .then(({ body: { game } }) => {
-                  expect(game.game_id).to.equal(4);
-                  expect(game.host_id).to.equal(1);
+                  expect(game.game_id).to.equal(3);
+                  expect(game.host_id).to.equal(5);
                   expect(game.opponent_id).to.equal(2);
                   expect(game.current_turn_id).to.equal(null);
                   expect(game.game_state).to.eql({ msg: 'no game state' });
                 });
             });
+        });
+        describe('ERRORS', () => {
+          it('status: 422, opponent_id does not exist', () => {
+            return request(app)
+              .post('/api/games')
+              .send({ title: 'test title', host_id: 5 })
+              .then(() => {
+                return request(app)
+                  .patch('/api/games/3')
+                  .send({ opponent_id: 999 })
+                  .expect(422)
+                  .then(({ body: { msg } }) => {
+                    expect(msg).to.equal('Unprocessable entity.');
+                  });
+              });
+          });
+          it('status: 404, game_id does not exist', () => {
+            return request(app)
+              .patch('/api/games/999')
+              .send({ opponent_id: 5 })
+              .expect(404)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal('Game not found.');
+              });
+          });
         });
       });
       describe('DELETE', () => {

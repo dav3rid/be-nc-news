@@ -1,1 +1,7 @@
-module.exports = [{ name: 'Dave' }, { name: 'Bill' }];
+module.exports = [
+  { name: 'Dave' },
+  { name: 'Bill' },
+  { name: 'Carl' },
+  { name: 'Danny' },
+  { name: 'Earl' },
+];

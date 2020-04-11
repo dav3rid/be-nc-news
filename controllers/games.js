@@ -18,7 +18,7 @@ exports.getGames = (req, res, next) => {
 
 exports.getGameById = (req, res, next) => {
   const { game_id } = req.params;
-  return Promise.all([fetchGameById(game_id), checkIfGameExists(game_id)])
+  Promise.all([fetchGameById(game_id), checkIfGameExists(game_id)])
     .then(([[game]]) => {
       res.status(200).send({ game });
     })
@@ -36,8 +36,8 @@ exports.postGame = (req, res, next) => {
 
 exports.patchGameById = (req, res, next) => {
   const { game_id } = req.params;
-  updateGameById(game_id, req.body)
-    .then(([{ game_state, ...rest }]) => {
+  Promise.all([updateGameById(game_id, req.body), checkIfGameExists(game_id)])
+    .then(([[{ game_state, ...rest }]]) => {
       const game = { game_state: JSON.parse(game_state), ...rest };
       res.status(200).send({ game });
     })

@@ -25,11 +25,4 @@ module.exports = [
     current_turn_id: 2,
     game_state: JSON.stringify(gameState),
   },
-  {
-    title: 'rando game',
-    host_id: 2,
-    opponent_id: 1,
-    current_turn_id: 1,
-    game_state: JSON.stringify(gameState),
-  },
 ];
