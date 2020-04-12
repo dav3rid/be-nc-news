@@ -1,9 +1,9 @@
 const connection = require('../db/connection');
 
-exports.fetchUserByUsername = username => {
+exports.fetchUserByName = name => {
   return connection('users')
     .select('*')
-    .where({ username })
+    .where({ name })
     .then(([user]) => {
       if (!user) {
         return Promise.reject({ status: 404, msg: 'User not found.' });
@@ -13,6 +13,14 @@ exports.fetchUserByUsername = username => {
     });
 };
 
-exports.fetchAllUsers = () => {
-  return connection('users').select('*');
+exports.fetchAllUsers = name => {
+  return connection('users')
+    .select('*')
+    .modify(query => {
+      if (name) query.where({ name });
+    });
+};
+
+exports.addUser = user => {
+  return connection('users').insert(user, '*');
 };

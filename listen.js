@@ -1,7 +1,7 @@
 const { PORT = 9090 } = process.env;
 
-const app = require('./app');
+const { server } = require('./app');
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Listening on ${PORT}...`);
 });
