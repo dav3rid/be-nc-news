@@ -1,11 +1,18 @@
 const apiRouter = require('express').Router();
+const topicsRouter = require('./topics-router');
 const usersRouter = require('./users-router');
-const gamesRouter = require('./games-router');
-
+const articlesRouter = require('./articles-router');
+const commentsRouter = require('./comments-router');
+const { getApiInfo } = require('../controllers/api');
 const { handle405s } = require('../errors');
 
+apiRouter.use('/topics', topicsRouter);
 apiRouter.use('/users', usersRouter);
-apiRouter.use('/games', gamesRouter);
-apiRouter.route('/').all(handle405s);
+apiRouter.use('/articles', articlesRouter);
+apiRouter.use('/comments', commentsRouter);
+apiRouter
+  .route('/')
+  .get(getApiInfo)
+  .all(handle405s);
 
 module.exports = apiRouter;

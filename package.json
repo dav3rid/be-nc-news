@@ -5,19 +5,16 @@
   "main": "index.js",
   "scripts": {
     "setup-dbs": "psql -f ./db/setup.sql",
-    "clear-db": "npm run setup-dbs && npm run migrate-latest",
-    "query": "psql -f ./db/query.sql >> query.txt",
     "seed": "knex seed:run",
-    "seed-test": "NODE_ENV=test knex seed:run",
     "test-utils": "mocha spec/utils.spec.js",
     "test": "mocha spec/app.spec.js",
     "migrate-latest": "knex migrate:latest",
     "migrate-rollback": "knex migrate:rollback",
     "migrate-make": "knex migrate:make",
     "dev": "nodemon listen.js",
-    "seed:prod": "NODE_ENV=production DB_URL=$(heroku config:get DATABASE_URL --app card-game-be) knex seed:run",
-    "migrate-latest:prod": "NODE_ENV=production DB_URL=$(heroku config:get DATABASE_URL --app card-game-be) knex migrate:latest",
-    "migrate-rollback:prod": "NODE_ENV=production DB_URL=$(heroku config:get DATABASE_URL --app card-game-be) knex migrate:rollback",
+    "seed:prod": "NODE_ENV=production DB_URL=$(heroku config:get DATABASE_URL) knex seed:run",
+    "migrate-latest:prod": "NODE_ENV=production DB_URL=$(heroku config:get DATABASE_URL) knex migrate:latest",
+    "migrate-rollback:prod": "NODE_ENV=production DB_URL=$(heroku config:get DATABASE_URL) knex migrate:rollback",
     "start": "node listen.js"
   },
   "repository": {
@@ -35,8 +32,7 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "knex": "^0.19.5",
-    "pg": "^7.12.1",
-    "socket.io": "^2.3.0"
+    "pg": "^7.12.1"
   },
   "devDependencies": {
     "chai": "^4.2.0",
