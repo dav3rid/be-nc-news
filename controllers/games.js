@@ -31,7 +31,11 @@ exports.postGame = (req, res, next) => {
       const game = { game_state: JSON.parse(game_state), ...rest };
       res.status(201).send({ game });
     })
-    .catch(next);
+    .catch(err => {
+      if (err.code === '23505')
+        next({ status: 422, msg: 'This host has an active session.' });
+      else next(err);
+    });
 };
 
 exports.patchGameById = (req, res, next) => {

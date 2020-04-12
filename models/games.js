@@ -6,6 +6,11 @@ exports.fetchGames = (host_id, available) => {
     .modify(query => {
       if (host_id) query.where({ host_id });
       if (available) query.where({ opponent_id: null });
+    })
+    .then(games => {
+      return games.map(({ game_state, ...rest }) => {
+        return { game_state: JSON.parse(game_state), ...rest };
+      });
     });
 };
 

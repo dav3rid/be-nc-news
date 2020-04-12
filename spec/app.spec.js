@@ -31,6 +31,17 @@ describe('/api', () => {
             expect(user).to.eql({ user_id: 6, name: 'Barry' });
           });
       });
+      describe('ERRORS', () => {
+        it('status: 422, user name already exists', () => {
+          return request(app)
+            .post('/api/users')
+            .send({ name: 'Dave' })
+            .expect(422)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal('User name is taken.');
+            });
+        });
+      });
     });
     describe('INVALID METHODS', () => {
       it('status: 405, for methods DELETE, PATCH, PUT', () => {
@@ -46,15 +57,25 @@ describe('/api', () => {
         return Promise.all(promises);
       });
     });
-    describe('/user_id', () => {
+    describe('/:name', () => {
       describe('GET', () => {
         it('status: 200, responds with an single user', () => {
           return request(app)
-            .get('/api/users/1')
+            .get('/api/users/Dave')
             .expect(200)
             .then(({ body: { user } }) => {
               expect(user.name).to.equal('Dave');
             });
+        });
+        describe('ERRORS', () => {
+          it('status: 404, user not found', () => {
+            return request(app)
+              .get('/api/users/Batman')
+              .expect(404)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal('User not found.');
+              });
+          });
         });
       });
       describe('INVALID METHODS', () => {
@@ -81,6 +102,7 @@ describe('/api', () => {
           .expect(200)
           .then(({ body: { games } }) => {
             expect(games.length).to.equal(2);
+            expect(typeof games[0].game_state).to.equal('object');
           });
       });
       describe('QUERIES', () => {
@@ -146,13 +168,13 @@ describe('/api', () => {
               expect(msg).to.equal('Unprocessable entity.');
             });
         });
-        it('status: 400, host must be unique', () => {
+        it('status: 422, host must be unique', () => {
           return request(app)
             .post('/api/games')
             .send({ title: 'A new game', host_id: 1 })
-            .expect(400)
+            .expect(422)
             .then(({ body: { msg } }) => {
-              expect(msg).to.equal('Bad request.');
+              expect(msg).to.equal('This host has an active session.');
             });
         });
       });
@@ -171,7 +193,7 @@ describe('/api', () => {
         return Promise.all(promises);
       });
     });
-    describe('/game_id', () => {
+    describe('/:game_id', () => {
       describe('GET', () => {
         it('status: 200, responds with a single game', () => {
           return request(app)

@@ -1,8 +1,8 @@
-const { fetchUserById, fetchAllUsers, addUser } = require('../models/users');
+const { fetchUserByName, fetchAllUsers, addUser } = require('../models/users');
 
-exports.getUserById = (req, res, next) => {
-  const { user_id } = req.params;
-  fetchUserById(user_id)
+exports.getUserByName = (req, res, next) => {
+  const { name } = req.params;
+  fetchUserByName(name)
     .then(user => {
       res.status(200).send({ user });
     })
@@ -10,7 +10,8 @@ exports.getUserById = (req, res, next) => {
 };
 
 exports.getAllUsers = (req, res, next) => {
-  fetchAllUsers()
+  const { name } = req.query;
+  fetchAllUsers(name)
     .then(users => {
       res.status(200).send({ users });
     })
@@ -22,5 +23,9 @@ exports.postUser = (req, res, next) => {
     .then(([user]) => {
       res.status(201).send({ user });
     })
-    .catch(next);
+    .catch(err => {
+      if (err.code === '23505')
+        next({ status: 422, msg: 'User name is taken.' });
+      else next(err);
+    });
 };
